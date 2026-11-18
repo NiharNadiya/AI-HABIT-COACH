@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+.venv/
+venv/
+*/venv/
+
+# Build artifacts
+dist/
+build/
+*/dist/
+*/build/
+target/
+src-tauri/target/
+src-tauri/gen/schemas
+
+# Python cache & bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Local Databases & storage
+backend/data/
+*.db
+*.sqlite
+*.sqlite3
+
+# Environment & credentials
+.env
+.env.local
+*.env
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# IDE
+.vscode/
+.idea/

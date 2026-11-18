@@ -1,0 +1,239 @@
+{
+  "name": "AI Habit Coach Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "wellness-alert",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "1c2563c8-3b35-4716-b0cc-e6e04a63633b",
+      "name": "Wellness Alert Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        -528,
+        160
+      ],
+      "webhookId": "9a295c70-3336-4d8b-918b-be1b68c70172"
+    },
+    {
+      "parameters": {
+        "text": "=You are an empathetic, professional AI Habit Coach. Analyze the user's current behavior metrics and generate a short, actionable, friendly 1-sentence recommendation. Keep it positive and under 15 words.\n\nMetrics:\n- Posture Score: {{ $json.body?.posture_score || $json.posture_score }}%\n- Sitting Duration: {{ $json.body?.sitting_minutes || $json.sitting_minutes }} minutes\n- Water Intake: {{ $json.body?.water_ml || $json.water_ml }} ml / {{ $json.body?.water_target || $json.water_target }} ml\n- Alert Event: {{ $json.body?.alert_type || $json.alert_type }}",
+        "options": {}
+      },
+      "id": "e294b026-f610-4b0f-94cb-9d69fc6d0f3a",
+      "name": "AI Habit Coach",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1,
+      "position": [
+        -288,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"recommendation\": \"{{ $json.output }}\",\n  \"status\": \"success\",\n  \"timestamp\": \"{{ new Date().toISOString() }}\"\n}",
+        "options": {}
+      },
+      "id": "9e46573b-a732-4ee7-b315-5a3b62a1c60e",
+      "name": "Respond to Caller",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "verify-phone",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "91d37f6d-8daf-4588-9c4b-a2be268c1a72",
+      "name": "Verify Phone Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        -528,
+        400
+      ],
+      "webhookId": "4166a7a1-ceea-4972-8abb-63e88e322b66"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"recipient_phone\": \"{{ $json.body?.recipient_phone || $json.recipient_phone }}\",\n  \"message\": \"Your AI Habit Coach verification code is: {{ $json.body?.verification_code || $json.verification_code }}\"\n}",
+        "options": {}
+      },
+      "id": "7b8e12a4-5c91-4e12-881b-987123abcdef",
+      "name": "Format OTP Message",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -288,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "model": "openrouter/auto",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -432,
+        280
+      ],
+      "id": "adba76d2-4bb9-4cd1-a2a4-e60722e0a619",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "FWSkZUu4s86lLZaU",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "check_phone",
+              "leftValue": "={{ $json.recipient_phone || $json.body?.recipient_phone || $('Wellness Alert Webhook').first()?.json?.body?.recipient_phone || $('Wellness Alert Webhook').first()?.json?.recipient_phone }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-node-phone-check",
+      "name": "Has Phone Number?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        180,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "from": "whatsapp:+14155238886",
+        "to": "={{ 'whatsapp:' + ($json.recipient_phone || $json.body?.recipient_phone || $('Wellness Alert Webhook').first()?.json?.body?.recipient_phone || $('Wellness Alert Webhook').first()?.json?.recipient_phone || '').trim().replace('whatsapp:', '') }}",
+        "message": "={{ $json.message || $json.output || ($json.body?.alert_type === 'daily_report' ? $json.body?.summary : $json.summary) || 'AI Habit Coach notification' }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        420,
+        260
+      ],
+      "id": "cf2f932a-10b7-4407-abc1-0756499ba581",
+      "name": "Send WhatsApp Message",
+      "credentials": {
+        "twilioApi": {
+          "id": "w4r7gb7lPkZwBGTd",
+          "name": "Twilio account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Wellness Alert Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Habit Coach",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Habit Coach": {
+      "main": [
+        [
+          {
+            "node": "Respond to Caller",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Caller": {
+      "main": [
+        [
+          {
+            "node": "Has Phone Number?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verify Phone Webhook": {
+      "main": [
+        [
+          {
+            "node": "Format OTP Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format OTP Message": {
+      "main": [
+        [
+          {
+            "node": "Has Phone Number?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Phone Number?": {
+      "main": [
+        [
+          {
+            "node": "Send WhatsApp Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Habit Coach",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

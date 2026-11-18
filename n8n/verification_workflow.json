@@ -1,0 +1,51 @@
+{
+  "name": "AI Habit Coach Verification Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "verify-phone",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "1ea6db20-22c6-4b82-9907-88cc29d10e5b",
+      "name": "Verify Phone Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "from": "whatsapp:+14155238886",
+        "to": "=whatsapp:{{ $json.recipient_phone.replace(/whatsapp:/g, '') }}",
+        "message": "=Your AI Habit Coach verification code is: {{ $json.verification_code }}"
+      },
+      "id": "9ea6f76c-2f3b-489e-8c34-3156cfd98d2b",
+      "name": "Send Twilio WhatsApp OTP",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        500,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Verify Phone Webhook": {
+      "main": [
+        [
+          {
+            "node": "Send Twilio WhatsApp OTP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {},
+  "pinData": {}
+}
