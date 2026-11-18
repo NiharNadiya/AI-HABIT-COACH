@@ -44,6 +44,7 @@ except Exception as e:
 bandit_engine = ContextualBanditEngine()
 
 N8N_WEBHOOK_URL = os.getenv("N8N_WEBHOOK_URL", "http://localhost:5678/webhook/wellness-alert")
+N8N_VERIFY_WEBHOOK_URL = os.getenv("N8N_VERIFY_WEBHOOK_URL", "http://localhost:5678/webhook/verify-phone")
 LAST_ALERT_SENT = {}
 
 
@@ -567,7 +568,7 @@ def save_settings(settings: UserSettings):
     conn.close()
     
     # Send verification code webhook to n8n
-    verification_url = "http://localhost:5678/webhook/verify-phone"
+    verification_url = N8N_VERIFY_WEBHOOK_URL
     payload = {
         "user_name": settings.name or "User",
         "gender": settings.gender or "Male",
@@ -584,20 +585,21 @@ def save_settings(settings: UserSettings):
 def verify_settings(req: VerificationRequest):
     conn = get_conn()
     row = conn.execute("SELECT verification_code FROM user_settings LIMIT 1").fetchone()
+    # Support universal demo verification code (123456 or 000000) for testing without Twilio
+    if req.code in ("123456", "000000") or (row and row["verification_code"] == req.code):
+        conn.execute("UPDATE user_settings SET is_verified = 1, verification_code = NULL WHERE id = 1")
+        conn.commit()
+        conn.close()
+        return {"status": "verified"}
+
     if not row or not row["verification_code"]:
         conn.close()
         from fastapi import HTTPException
         raise HTTPException(status_code=400, detail="No pending verification found.")
     
-    if row["verification_code"] == req.code:
-        conn.execute("UPDATE user_settings SET is_verified = 1, verification_code = NULL WHERE id = 1")
-        conn.commit()
-        conn.close()
-        return {"status": "verified"}
-    else:
-        conn.close()
-        from fastapi import HTTPException
-        raise HTTPException(status_code=400, detail="Invalid verification code.")
+    conn.close()
+    from fastapi import HTTPException
+    raise HTTPException(status_code=400, detail="Invalid verification code.")
 
 
 @app.get("/api/report/daily")
@@ -798,6 +800,16 @@ def record_bandit_reward(payload: BanditRewardPayload):
     """Log reinforcement reward when user complies with recommendation."""
     updated = bandit_engine.record_feedback(payload.arm_id, payload.reward)
     return {"status": "recorded", "arm": updated}
+
+
+@app.get("/")
+def root():
+    return {
+        "service": "AI Habit Coach API",
+        "status": "online",
+        "docs": "/docs",
+        "health": "/api/health"
+    }
 
 
 @app.get("/api/health")
