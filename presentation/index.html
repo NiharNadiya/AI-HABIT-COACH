@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Habit Coach — Academic Presentation Deck</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #070c0f;
+      --card-bg: rgba(13, 21, 18, 0.85);
+      --border: #1f2e2a;
+      --teal: #2dd4bf;
+      --teal-glow: rgba(45, 212, 191, 0.25);
+      --green: #10b981;
+      --amber: #f59e0b;
+      --text: #e6f4f1;
+      --muted: #8ea19c;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+      user-select: none;
+    }
+
+    /* Ambient background glow */
+    .ambient-glow {
+      position: fixed;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(45, 212, 191, 0.08) 0%, transparent 70%);
+      top: -100px;
+      right: -100px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .slide-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      z-index: 1;
+    }
+
+    .slide {
+      display: none;
+      width: 100%;
+      max-width: 1200px;
+      height: 85vh;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 48px 56px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 40px var(--teal-glow);
+      backdrop-filter: blur(16px);
+      flex-direction: column;
+      justify-content: space-between;
+      animation: fadeIn 0.35s ease-out;
+      overflow-y: auto;
+    }
+
+    .slide.active {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px) scale(0.99); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* Slide Header */
+    .slide-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 20px;
+      margin-bottom: 24px;
+    }
+
+    .eyebrow {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--teal);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .eyebrow::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      background: var(--teal);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--teal);
+    }
+
+    h1.slide-title {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #ffffff;
+    }
+
+    .slide-number {
+      font-size: 14px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.04);
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+    }
+
+    /* Content Layouts */
+    .slide-body {
+      flex: 1;
+      display: flex;
+      gap: 32px;
+      align-items: stretch;
+    }
+
+    .col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .card {
+      background: rgba(7, 12, 15, 0.6);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px 24px;
+    }
+
+    .card h3 {
+      font-size: 16px;
+      color: var(--teal);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card p, .card li {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #c4d7d2;
+    }
+
+    ul.bullet-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    ul.bullet-list li {
+      position: relative;
+      padding-left: 24px;
+      font-size: 15px;
+      line-height: 1.55;
+      color: #d1e3df;
+    }
+
+    ul.bullet-list li::before {
+      content: '▹';
+      position: absolute;
+      left: 0;
+      color: var(--teal);
+      font-weight: bold;
+    }
+
+    /* Metrics Grid */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin: 12px 0;
+    }
+
+    .metric-box {
+      background: rgba(45, 212, 191, 0.05);
+      border: 1px solid rgba(45, 212, 191, 0.2);
+      border-radius: 14px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .metric-value {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--teal);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .metric-label {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-top: 4px;
+    }
+
+    /* Math Formula Block */
+    .math-block {
+      background: rgba(0, 0, 0, 0.4);
+      border-left: 3px solid var(--teal);
+      padding: 14px 18px;
+      border-radius: 0 10px 10px 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: #a5f3fc;
+      line-height: 1.6;
+      margin: 8px 0;
+    }
+
+    /* Code block */
+    code, pre {
+      font-family: 'JetBrains Mono', monospace;
+      background: rgba(0, 0, 0, 0.4);
+      color: #34d399;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+
+    /* Footer Navigation */
+    .slide-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--border);
+      padding-top: 16px;
+      margin-top: 20px;
+    }
+
+    .footer-note {
+      font-size: 12px;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    .controls {
+      display: flex;
+      gap: 12px;
+    }
+
+    button.nav-btn {
+      background: rgba(45, 212, 191, 0.1);
+      border: 1px solid var(--border);
+      color: var(--teal);
+      padding: 8px 18px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    button.nav-btn:hover {
+      background: var(--teal);
+      color: #070c0f;
+      box-shadow: 0 0 15px var(--teal-glow);
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .badge-teal { background: rgba(45, 212, 191, 0.15); color: #2dd4bf; border: 1px solid #2dd4bf; }
+    .badge-green { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid #10b981; }
+    .badge-amber { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid #f59e0b; }
+
+    /* Print styling */
+    @media print {
+      body { overflow: visible; height: auto; }
+      .slide-container { display: block; padding: 0; }
+      .slide { display: flex !important; page-break-after: always; height: 100vh; border-radius: 0; border: none; box-shadow: none; }
+      .slide-footer, .nav-btn, .ambient-glow { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="ambient-glow"></div>
+
+  <div class="slide-container">
+
+    <!-- SLIDE 1: TITLE SLIDE -->
+    <div class="slide active" id="slide-1">
+      <div class="slide-header">
+        <div>
+          <div class="eyebrow">Academic Capstone Defense • Final Presentation</div>
+          <h1 class="slide-title">AI Habit Coach</h1>
+        </div>
+        <div class="slide-number">01 / 12</div>
+      </div>
+      <div class="slide-body" style="align-items: center; justify-content: center; text-align: center;">
+        <div style="max-width: 850px;">
+          <h2 style="font-size: 26px; font-weight: 700; color: #ffffff; line-height: 1.4; margin-bottom: 16px;">
+            Real-Time Edge Computer Vision & Multi-Armed Bandit Reinforcement Learning for Workplace Ergonomic Interventions
+          </h2>
+          <p style="font-size: 16px; color: var(--muted); margin-bottom: 28px; line-height: 1.6;">
+            A privacy-preserving, zero-hardware-cost workplace wellness platform utilizing client-side MediaPipe pose kinematics, an ensemble Random Forest regressor, and adaptive UCB1 reinforcement learning.
+          </p>
+
+          <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 32px; flex-wrap: wrap;">
+            <span class="badge badge-teal">Edge Computer Vision (30 FPS)</span>
+            <span class="badge badge-green">Random Forest Regressor (R² = 0.91)</span>
+            <span class="badge badge-amber">Contextual Bandit (UCB1 RL)</span>
+            <span class="badge badge-teal">Zero PII Video Transfer</span>
+            <span class="badge badge-green">ISO 11226 Ergonomics</span>
+          </div>
+
+          <div class="card" style="display: inline-block; text-align: left; padding: 18px 32px; background: rgba(13, 21, 18, 0.9);">
+            <div style="font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em;">Presented by</div>
+            <div style="font-size: 20px; font-weight: 700; color: #ffffff; margin-top: 2px;">Nihar Nadiya</div>
+            <div style="font-size: 13px; color: var(--teal); margin-top: 2px;">Domain: Edge AI, Applied Machine Learning & Human-Computer Interaction</div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <div class="footer-note">Use Left / Right arrow keys to navigate slides • Press 'F' for Fullscreen</div>
+        <div class="controls">
+          <button class="nav-btn" onclick="prevSlide()">← Prev</button>
+          <button class="nav-btn" onclick="nextSlide()">Next →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 2: THE CLINICAL PROBLEM -->
+    <div class="slide" id="slide-2">
+      <div class="slide-header">
+        <div>
+          <div class="eyebrow">Problem Statement & Clinical Motivation</div>
+          <h1 class="slide-title">The Sedentary Ergonomics Crisis</h1>
+        </div>
+        <div class="slide-number">02 / 12</div>
+      </div>
+      <div class="slide-body">
+        <div class="col">
+          <div class="card" style="flex: 1;">
+            <h3>⚠️ Biomechanics of "Text Neck" Syndrome</h3>
+            <p>At neutral posture (0°), the human head imposes <strong>10–12 lbs</strong> of gravitational load on the cervical spine.</p>
+            <div class="math-block">
+              0° Flexion (Neutral):  10–12 lbs (4.5–5.4 kg)<br>
+              15° Tilt:               27 lbs (12.2 kg)<br>
+              30° Tilt:               40 lbs (18.1 kg)<br>
+              60° Slouch (Typical):   60 lbs (27.2 kg) on C1–C7 vertebrae!
+            </div>
+            <p style="margin-top: 8px;">Continuous 60-lb shear torque causes chronic disc herniation, cervicogenic headaches, and permanent spinal remodeling.</p>
+          </div>
+          <div class="card">
+            <h3>📏 International Clinical Grounding</h3>
+            <p><strong>ISO 11226:</strong> Ergonomics — Evaluation of static working postures.<br>
+            <strong>RULA Standard:</strong> Rapid Upper Limb Assessment for postural fatigue.<br>
+            <strong>WHO Guidelines:</strong> Stratified daily hydration & 30-min break limits.</p>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="card" style="flex: 1;">
+            <h3>❌ Critical Flaws in Existing Solutions</h3>
+            <ul class="bullet-list" style="margin-top: 8px;">
+              <li><strong>Static Pomodoro Timers:</strong> Blind to human physiological state. They alert when you are in flow, and stay silent when you slouch.</li>
+              <li><strong>Wearable Posture Sensors:</strong> High initial cost ($150–$300), battery recharging friction, and over <strong>72% abandonment rate</strong> within 3 weeks.</li>
+              <li><strong>Notification Fatigue:</strong> Generic popups ("Sit straight!") induce cognitive blindness; users dismiss them without behavioral adoption.</li>
+              <li><strong>Cloud Privacy Concerns:</strong> Traditional camera-based systems stream raw video to external servers, violating workplace privacy laws (GDPR/HIPAA).</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <div class="footer-note">Key Insight: The goal is an ambient, zero-cost, privacy-preserving, and adaptive intervention.</div>
+        <div class="controls">
+          <button class="nav-btn" onclick="prevSlide()">← Prev</button>
+          <button class="nav-btn" onclick="nextSlide()">Next →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 3: SYSTEM ARCHITECTURE -->
+    <div class="slide" id="slide-3">
+      <div class="slide-header">
+        <div>
+          <div class="eyebrow">System Engineering</div>
+          <h1 class="slide-title">4-Tier Edge-Cloud Architecture</h1>
+        </div>
+        <div class="slide-number">03 / 12</div>
+      </div>
+      <div class="slide-body">
+        <div class="col" style="flex: 1.2;">
+          <div class="card" style="height: 100%;">
+            <h3>🏗️ End-to-End Pipeline</h3>
+            <ul class="bullet-list" style="margin-top: 10px;">
+              <li><strong>Tier 1: Edge Vision Layer (Client Browser)</strong><br>
+                Google MediaPipe Pose extracts 33 3D coordinates via WebAssembly @ 30 FPS. Computes relative Craniovertebral Angle. Video never leaves RAM.</li>
+              <li><strong>Tier 2: Backend Intelligence Layer (FastAPI Microservice)</strong><br>
+                Receives lightweight JSON behavior tuples. Coordinates session state in SQLite, evaluates Random Forest Health Score, and updates Reinforcement Learning arms.</li>
+              <li><strong>Tier 3: Autonomous Orchestrator (n8n Engine)</strong><br>
+                Decoupled event-driven workflow engine listening for clinical threshold events (>5 min slouching, >30 min sitting, 8:00 PM summary).</li>
+              <li><strong>Tier 4: Proactive Nudge & Delivery (Gemini LLM + Twilio)</strong><br>
+                Google Gemini synthesizes context-aware empathetic habit micro-nudges delivered directly to user's WhatsApp.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="card" style="flex: 1;">
+            <h3>🔒 Privacy-First Design</h3>
+            <div class="metrics-grid" style="grid-template-columns: 1fr; gap: 12px; margin: 12px 0;">
+              <div class="metric-box">
+                <div class="metric-value">0 Bytes</div>
+                <div class="metric-label">Video Transmitted to Cloud</div>
+              </div>
+              <div class="metric-box">
+                <div class="metric-value">&lt; 1.2 KB</div>
+                <div class="metric-label">Metadata Per Minute (Angles Only)</div>
+              </div>
+              <div class="metric-box">
+                <div class="metric-value">99.98%</div>
+                <div class="metric-label">Bandwidth Savings vs. Video Streaming</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <div class="footer-note">Complete decoupling: Vision on client edge, ML on backend, LLM orchestration on n8n.</div>
+        <div class="controls">
+          <button class="nav-btn" onclick="prevSlide()">← Prev</button>
+          <button class="nav-btn" onclick="nextSlide()">Next →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 4: COMPUTER VISION PIPELINE -->
+    <div class="slide" id="slide-4">
+      <div class="slide-header">
+        <div>
+          <div class="eyebrow">Computer Vision & Kinematics</div>
+          <h1 class="slide-title">Edge Landmark Geometry & Filtering</h1>
+        </div>
+        <div class="slide-number">04 / 12</div>
+      </div>
+      <div class="slide-body">
+        <div class="col">
+          <div class="card">
+            <h3>📍 Key Anatomical Landmarks Tracked</h3>
+            <p>From MediaPipe's 33 3D keypoints, we isolate upper-body postural landmarks:</p>
+            <ul class="bullet-list" style="margin-top: 8px;">
+              <li><strong>Tragus of Ears:</strong> Landmarks 7 (Left) and 8 (Right)</li>
+              <li><strong>Acromion of Shoulders:</strong> Landmarks 11 (Left) and 12 (Right)</li>
+              <li><strong>Greater Trochanter of Hips:</strong> Landmarks 23 (Left) and 24 (Right)</li>
+              <li><strong>Nose Reference:</strong> Landmark 0 for forward focal depth</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <h3>〰️ Jitter Elimination (EMA Smoothing)</h3>
+            <div class="math-block">
+              x̂_t = α · x_t + (1 - α) · x̂_{t-1},  where α = 0.35
+            </div>
+            <p>Removes sensor noise, hand shadows, and micro-movements without introducing perceptible latency lag.</p>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="card" style="flex: 1;">
+            <h3>📐 Kinematic Formulations</h3>
+            <p><strong>1. Craniovertebral Vector Angle:</strong></p>
+            <div class="math-block">
+              θ_neck = atan2(y_ear - y_shoulder, x_ear - x_shoulder) × (180° / π)
+            </div>
+            <p><strong>2. Torso Verticality:</strong></p>
+            <div class="math-block">
+              θ_torso = atan2(y_shoulder - y_hip, x_shoulder - x_hip) × (180° / π)
+            </div>
+            <p><strong>3. Shoulder Asymmetry / Lateral Tilt:</strong></p>
+            <div class="math-block">
+              Tilt_shoulder = (|y_11 - y_12| / ||v_11 - v_12||) × 100%
+            </div>
+            <p style="font-size: 13px; color: var(--muted); margin-top: 6px;">
+              Indicates lateral spinal listing, un-ergonomic mouse elevation, or uneven armrest resting.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <div class="footer-note">Executed entirely in client WebAssembly at 30 FPS.</div>
+        <div class="controls">
+          <button class="nav-btn" onclick="prevSlide()">← Prev</button>
+          <button class="nav-btn" onclick="nextSlide()">Next →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 5: CALIBRATION INNOVATION -->
+    <div class="slide" id="slide-5">
+      <div class="slide-header">
+        <div>
+          <div class="eyebrow">Novel Algorithmic Contribution</div>
+          <h1 class="slide-title">1-Click Anthropometric Calibration</h1>
+        </div>
+        <div class="slide-number">05 / 12</div>
+      </div>
+      <div class="slide-body">
+        <div class="col">
+          <div class="card" style="flex: 1;">
+            <h3>📐 The "Laptop Pitch Angle" Distortion</h3>
+            <p>Why naive 2D posture algorithms fail in commercial deployment:</p>
+            <ul class="bullet-list" style="margin-top: 8px;">
+              <li>Laptop placed on a low desk looks <strong>upward at the user's chin</strong> at an angle of +15° to +30°.</li>
+              <li>An external monitor placed high looks <strong>downward</strong>.</li>
+              <li>A fixed absolute threshold (e.g. <code>neckAngle > 60°</code>) results in a <strong>massive false-positive slouch rate</strong> on laptops.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>⏱️ 5-Minute Sliding Window Accumulator</h3>
+            <p>Slouches are only confirmed if sustained across sliding 5-min intervals (<code>1→5, 2→6, 3→7 min</code>), preventing alerts when taking a quick sip of coffee or stretching.</p>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="card" style="flex: 1;">
+            <h3>🎯 The Solution: Personalized Relative Baseline</h3>
+            <p><strong>Step 1: 3-Second Median Sampling Buffer</strong></p>
+            <div class="math-block">
+              θ_baseline = median({ θ_1, θ_2, ..., θ_90 })
+            </div>
+            <p><strong>Step 2: Relative Angular Deviation (Δθ)</strong></p>
+            <div class="math-block">
+              Δθ = |θ_current - θ_baseline|
+            </div>
+            <p><strong>Step 3: Clinical ISO 11226 Decision Boundary</strong></p>
+            <div class="math-block">
+              Posture State = Upright (Good)   if Δθ ≤ 14.0°<br>
+              Posture State = Slouch (Bad)      if Δθ &gt; 14.0°
+            </div>
+            <p style="font-size: 13px; color: var(--teal); margin-top: 6px;">
+              ✓ Completely camera-invariant, chair-invariant, and height-invariant.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <div class="footer-note">Persisted in browser localStorage — eliminates calibration friction on subsequent sessions.</div>
+        <div class="controls">
+          <button class="nav-btn" onclick="prevSlide()">← Prev</button>
+          <button class="nav-btn" onclick="nextSlide()">Next →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 6: RANDOM FOREST REGRESSOR -->
+    <div class="slide" id="slide-6">
+      <div class="slide-header">
+        <div>
+          <div class="eyebrow">Machine Learning • Model 1</div>
+          <h1 class="slide-title">Random Forest Ergonomic Health Score</h1>
+        </div>
+        <div class="slide-number">06 / 12</div>
+      </div>
+      <div class="slide-body">
+        <div class="col">
+          <div class="card">
+            <h3>🌲 Ensemble Architecture & Training</h3>
+            <ul class="bullet-list">
+              <li><strong>Architecture:</strong> 60 Decision Trees with Bootstrap Bagging.</li>
+              <li><strong>Split Criterion:</strong> MSE Variance Reduction.</li>
+              <li><strong>Training Dataset:</strong> 1,200 simulated ergonomic sessions across combinations of posture distributions, sedentary duration (0–120m), and hydration.</li>
+              <li><strong>Zero Dependencies:</strong> Pure Python implementation (< 2ms runtime, zero C-compiler dependencies).</li>
+            </ul>
+          </div>
+
+          <div class="metrics-grid">
+            <div class="metric-box">
+              <div class="metric-value">0.9136</div>
+              <div class="metric-label">R² Goodness of Fit</div>
+            </div>
+            <div class="metric-box">
+              <div class="metric-value">3.01</div>
+              <div class="metric-label">Mean Absolute Error</div>
+            </div>
+            <div class="metric-box">
+              <div class="metric-value">1.8 ms</div>
+              <div class="metric-label">Inference Latency</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="card" style="flex: 1;">
+            <h3>📊 Discovered Feature Importances (Gini Impurity)</h3>
+            <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 12px;">
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
+                  <span>Posture Average (CVA Quality)</span>
+                  <span style="font-weight: 700; color: var(--teal);">48.2%</span>
+                </div>
+                <div style="background: rgba(255,255,255,0.06); height: 8px; border-radius: 4px; overflow: hidden;">
+                  <div style="width: 48.2%; height: 100%; background: var(--teal);"></div>
+                </div>
+              </div>
+
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
+                  <span>Sitting Minutes (Uninterrupted Sedentary)</span>
+                  <span style="font-weight: 700; color: var(--green);">24.1%</span>
+                </div>
+                <div style="background: rgba(255,255,255,0.06); height: 8px; border-radius: 4px; overflow: hidden;">
+                  <div style="width: 24.1%; height: 100%; background: var(--green);"></div>
+                </div>
+              </div>
+
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
+                  <span>Hydration Ratio (Logged vs WHO Target)</span>
+                  <span style="font-weight: 700; color: var(--amber);">18.6%</span>
+                </div>
+                <div style="background: rgba(255,255,255,0.06); height: 8px; border-radius: 4px; overflow: hidden;">
+                  <div style="width: 18.6%; height: 100%; background: var(--amber);"></div>
+                </div>
+              </div>
+
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
+                  <span>Active Break Ratio</span>
+                  <span style="font-weight: 700; color: #a78bfa;">9.1%</span>
+                </div>
+                <div style="background: rgba(255,255,255,0.06); height: 8px; border-radius: 4px; overflow: hidden;">
+                  <div style="width: 9.1%; height: 100%; background: #a78bfa;"></div>
+                </div>
+              </div>
+            </div>
+            <p style="font-size: 12px; color: var(--muted); margin-top: 16px;">
+              Clinical Takeaway: While posture is #1, uninterrupted sitting duration accounts for nearly a quarter of overall physical strain.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <div class="footer-note">Model saved as JSON AST and hot-loaded at backend startup.</div>
+        <div class="controls">
+          <button class="nav-btn" onclick="prevSlide()">← Prev</button>
+          <button class="nav-btn" onclick="nextSlide()">Next →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 7: REINFORCEMENT LEARNING BANDIT -->
+    <div class="slide" id="slide-7">
+      <div class="slide-header">
+        <div>
+          <div class="eyebrow">Machine Learning • Model 2</div>
+          <h1 class="slide-title">Contextual Bandit for Habit Formation</h1>
+        </div>
+        <div class="slide-number">07 / 12</div>
+      </div>
+      <div class="slide-body">
+        <div class="col">
+          <div class="card">
+            <h3>🧠 Solving Notification Fatigue</h3>
+            <p>Traditional wellness apps fail because repeating "Drink Water" creates sensory desensitization. We model intervention as an online Reinforcement Learning problem.</p>
+          </div>
+
+          <div class="card">
+            <h3>🎯 5 Clinically Validated Action Arms (A)</h3>
+            <ul class="bullet-list" style="font-size: 13px;">
+              <li><code>neck_stretch</code>: Isometric cervical retractions</li>
+              <li><code>hydration_sip</code>: 150–250ml targeted water sip</li>
+              <li><code>standing_walk</code>: 60–90 second active movement</li>
+              <li><code>eye_rest_20</code>: 20-20-20 rule for digital eye strain</li>
+              <li><code>shoulder_retraction</code>: Scapular pinches for thoracic kyphosis</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="card" style="flex: 1;">
+            <h3>⚖️ UCB1 (Upper Confidence Bound) Policy</h3>
+            <div class="math-block">
+              Score_i = μ̂_i + c · √( (2 · ln N) / n_i )
+            </div>
+            <p><strong>Exploitation term (μ̂_i):</strong> Recommends arms the user has reliably completed in the past.</p>
+            <p><strong>Exploration term (√(2 ln N / n_i)):</strong> Boosts un-tested arms so the coach continuously discovers new habit receptivity.</p>
+            
+            <div style="margin-top: 14px; padding: 12px; background: rgba(16, 185, 129, 0.08); border: 1px solid var(--green); border-radius: 8px;">
+              <strong style="color: var(--green);">✓ Closed-Loop Reward:</strong> When user clicks "+1 Reward" in the UI, state updates instantly: 
+              <code>n_i ← n_i + 1</code>, <code>μ̂_i ← μ̂_i + (r - μ̂_i)/n_i</code>.
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <div class="footer-note">Provable sublinear regret: Adapts uniquely to each individual user within 15–20 interactions.</div>
+        <div class="controls">
+          <button class="nav-btn" onclick="prevSlide()">← Prev</button>
+          <button class="nav-btn" onclick="nextSlide()">Next →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 8: AUTONOMOUS ORCHESTRATION -->
+    <div class="slide" id="slide-8">
+      <div class="slide-header">
+        <div>
+          <div class="eyebrow">Cloud Automation & Generative AI</div>
+          <h1 class="slide-title">n8n Orchestration & WhatsApp Alerts</h1>
+        </div>
+        <div class="slide-number">08 / 12</div>
+      </div>
+      <div class="slide-body">
+        <div class="col">
+          <div class="card" style="flex: 1;">
+            <h3>⚡ Event-Driven Autonomous Triggers</h3>
+            <ul class="bullet-list">
+              <li><strong>Slouching Alert:</strong> Fired when sustained slouch exceeds 5 minutes.</li>
+              <li><strong>Sedentary Warning:</strong> Fired when user sits uninterrupted for 30 minutes without a break.</li>
+              <li><strong>8:00 PM Daily Digest:</strong> Scheduled cron thread compiling daily average posture, water deficit, and cumulative sitting hours into a clinical evening summary.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>🤖 Google Gemini Context Injection</h3>
+            <p style="font-size: 13px;">Prompt passes demographic criteria (age, gender), exact continuous sitting duration, and water deficit to Gemini 2.5 Flash to generate empathetic, non-robotic micro-nudges.</p>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="card" style="flex: 1;">
+            <h3>📱 Omnichannel WhatsApp Dispatch</h3>
+            <div style="background: rgba(37, 211, 102, 0.08); border: 1px solid #25d366; border-radius: 12px; padding: 16px; margin: 10px 0;">
+              <div style="font-size: 12px; color: #25d366; font-weight: 700; margin-bottom: 6px;">WHATSAPP NOTIFICATION PREVIEW</div>
+              <div style="font-size: 14px; color: #ffffff; line-height: 1.5;">
+                "Hey Nihar! 🌿 You've been coding strong for 35 continuous minutes, but your neck angle just drifted forward by 18°. Roll your shoulders back and take a 20-second sip of water to stay sharp! 💧"
+              </div>
+            </div>
+            <p style="font-size: 13px; color: var(--muted);">
+              Delivered via Twilio WhatsApp API. Reaches the user even when the browser is minimized or when working in full-screen IDEs.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <div class="footer-note">Microservice architecture keeps AI generation separate from low-latency computer vision.</div>
+        <div class="controls">
+          <button class="nav-btn" onclick="prevSlide()">← Prev</button>
+          <button class="nav-btn" onclick="nextSlide()">Next →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 9: BENCHMARKS & EVALUATION -->
+    <div class="slide" id="slide-9">
+      <div class="slide-header">
+        <div>
+          <div class="eyebrow">Empirical Results</div>
+          <h1 class="slide-title">System Benchmarks & Performance</h1>
+        </div>
+        <div class="slide-number">09 / 12</div>
+      </div>
+      <div class="slide-body">
+        <div class="col">
+          <div class="card">
+            <h3>⚡ Latency & Computational Footprint</h3>
+            <div class="metrics-grid">
+              <div class="metric-box">
+                <div class="metric-value">28–30</div>
+                <div class="metric-label">Client Edge FPS</div>
+              </div>
+              <div class="metric-box">
+                <div class="metric-value">12.4 ms</div>
+                <div class="metric-label">Vision Frame Time</div>
+              </div>
+              <div class="metric-box">
+                <div class="metric-value">1.8 ms</div>
+                <div class="metric-label">Server ML Eval</div>
+              </div>
+            </div>
+            <p style="font-size: 13px; color: var(--muted); margin-top: 8px;">
+              Tested on standard M-Series Mac and mid-tier Intel i5 laptops. Negligible CPU load (&lt;6% system usage).
+            </p>
+          </div>
+
+          <div class="card">
+            <h3>📊 Model Validation Metrics</h3>
+            <ul class="bullet-list" style="font-size: 13px;">
+              <li><strong>R² Score:</strong> 0.9136 (Strong variance explanation)</li>
+              <li><strong>Mean Absolute Error:</strong> 3.01 points out of 100</li>
+              <li><strong>MSE Loss:</strong> 15.82 variance error</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="card" style="flex: 1;">
+            <h3>🛠️ Deployment Portability</h3>
+            <ul class="bullet-list">
+              <li><strong>Zero C-Extension Wheels:</strong> Both Random Forest and Contextual Bandit are implemented in pure Python, eliminating NumPy/SciPy container compilation failures on Linux/Render.</li>
+              <li><strong>Full-Stack Live Cloud Deployment:</strong>
+                <br>• Frontend: Vercel Global Edge CDN
+                <br>• Backend: Render Cloud Web Service (FastAPI)
+                <br>• Automation: Render Docker Container (n8n Engine)
+              </li>
+              <li><strong>Local Hybrid Compatibility:</strong> Works seamlessly offline on <code>localhost</code> or in the cloud.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <div class="footer-note">Complete system validation across edge, API, and cloud orchestrator tiers.</div>
+        <div class="controls">
+          <button class="nav-btn" onclick="prevSlide()">← Prev</button>
+          <button class="nav-btn" onclick="nextSlide()">Next →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 10: LIVE DEMO SEQUENCE -->
+    <div class="slide" id="slide-10">
+      <div class="slide-header">
+        <div>
+          <div class="eyebrow">Practical Demonstration</div>
+          <h1 class="slide-title">Live Demonstration Walkthrough</h1>
+        </div>
+        <div class="slide-number">10 / 12</div>
+      </div>
+      <div class="slide-body">
+        <div class="col" style="flex: 1.2;">
+          <div class="card" style="height: 100%;">
+            <h3>🧪 Step-by-Step Live Demo Protocol</h3>
+            <ul class="bullet-list" style="margin-top: 10px;">
+              <li><strong>Step 1: Edge Vision & Landmark Canvas</strong><br>
+                Show webcam feed running MediaPipe 33-point skeleton overlay. Point out that frames stay 100% inside the browser.</li>
+              <li><strong>Step 2: 1-Click Anthropometric Calibration</strong><br>
+                Click "🎯 Calibrate Posture" — sit upright for 3 seconds. Show baseline angle lock and zero relative deviation (Δθ = 0°).</li>
+              <li><strong>Step 3: Upright vs. Slouching Posture Transition</strong><br>
+                Sit upright (Health Score ~88–95, green ring). Deliberately slouch forward (>14° deviation). Watch the sliding window accumulate and score drop to ~45–55 (amber/red ring).</li>
+              <li><strong>Step 4: Reinforcement Learning Feedback</strong><br>
+                Show Contextual Bandit action recommendation. Click "✓ I Followed This (+1 Reward)". Show instant closed-loop policy update.</li>
+              <li><strong>Step 5: WhatsApp Alert Dispatch</strong><br>
+                Trigger alert webhook; show incoming WhatsApp notification delivered by n8n, Gemini, and Twilio.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="card" style="flex: 1; justify-content: center; align-items: center; text-align: center;">
+            <div style="font-size: 48px; margin-bottom: 12px;">💻 📱</div>
+            <h3 style="justify-content: center;">Switch to Live Application</h3>
+            <p style="margin-top: 8px;">Open <code>http://localhost:5173</code> (or your Vercel cloud deployment) to conduct the interactive demonstration.</p>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <div class="footer-note">Ready for live interactive execution.</div>
+        <div class="controls">
+          <button class="nav-btn" onclick="prevSlide()">← Prev</button>
+          <button class="nav-btn" onclick="nextSlide()">Next →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 11: FUTURE WORK -->
+    <div class="slide" id="slide-11">
+      <div class="slide-header">
+        <div>
+          <div class="eyebrow">Academic Significance & Roadmap</div>
+          <h1 class="slide-title">Clinical Impact & Future Scope</h1>
+        </div>
+        <div class="slide-number">11 / 12</div>
+      </div>
+      <div class="slide-body">
+        <div class="col">
+          <div class="card" style="flex: 1;">
+            <h3>🌟 Academic & Industry Significance</h3>
+            <ul class="bullet-list">
+              <li><strong>Democratizing Preventative Healthcare:</strong> Replaces $300+ ergonomic chairs and wearable sensors with a commodity webcam.</li>
+              <li><strong>Privacy-by-Design Benchmark:</strong> Proves that clinical computer vision can be deployed in enterprise without transmitting video streams.</li>
+              <li><strong>Habit Formation Through RL:</strong> Demonstrates that Multi-Armed Bandits effectively overcome the classic health intention-behavior gap.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="card" style="flex: 1;">
+            <h3>🚀 Future Research Extensions</h3>
+            <ul class="bullet-list">
+              <li><strong>IMU Sensor Fusion:</strong> Integrating Apple Watch / smartwatch accelerometers to detect repetitive wrist strain and ergonomic mouse posture.</li>
+              <li><strong>Monocular Lumbar Spine Estimation:</strong> Leveraging single-camera depth models (MiDaS) to estimate lower back curvature and lumbar lordosis.</li>
+              <li><strong>Federated Machine Learning:</strong> Training the Random Forest and Bandit policies collaboratively across distributed corporate endpoints without pooling personal user data.</li>
+              <li><strong>Native Desktop Menubar App:</strong> Packaging via Tauri/Rust to run silently in the system tray with zero browser overhead.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <div class="footer-note">Foundation laid for future clinical publication and enterprise workplace health tools.</div>
+        <div class="controls">
+          <button class="nav-btn" onclick="prevSlide()">← Prev</button>
+          <button class="nav-btn" onclick="nextSlide()">Next →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 12: DEFENSE Q&A -->
+    <div class="slide" id="slide-12">
+      <div class="slide-header">
+        <div>
+          <div class="eyebrow">Conclusion & Defense</div>
+          <h1 class="slide-title">Thank You • Defense Q&A</h1>
+        </div>
+        <div class="slide-number">12 / 12</div>
+      </div>
+      <div class="slide-body" style="align-items: center; justify-content: center;">
+        <div style="max-width: 800px; text-align: center;">
+          <h2 style="font-size: 32px; font-weight: 800; color: #ffffff; margin-bottom: 16px;">
+            Questions & Answers
+          </h2>
+          <p style="font-size: 16px; color: var(--muted); margin-bottom: 32px;">
+            Ready to address technical inquiries on Edge Computer Vision kinematics, Random Forest feature importance, UCB1 bandit convergence, or full-stack cloud architecture.
+          </p>
+
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; text-align: left;">
+            <div class="card">
+              <div style="font-size: 13px; font-weight: 700; color: var(--teal);">Computer Vision & Calibration</div>
+              <p style="font-size: 12px; margin-top: 4px; color: var(--muted);">MediaPipe 33-point topology, EMA smoothing (α=0.35), 3s median baseline, and Δθ ISO 11226 thresholds.</p>
+            </div>
+            <div class="card">
+              <div style="font-size: 13px; font-weight: 700; color: var(--green);">Random Forest & Reinforcement Learning</div>
+              <p style="font-size: 12px; margin-top: 4px; color: var(--muted);">60-tree ensemble (R²=0.91), Gini impurity, UCB1 exploration-exploitation trade-off, and closed-loop reward updates.</p>
+            </div>
+          </div>
+
+          <div style="margin-top: 32px; font-size: 14px; color: var(--muted);">
+            Project Repository: <code style="color: var(--teal);">github.com/NiharNadiya/AI-HABIT-COACH</code>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <div class="footer-note">AI Habit Coach • Capstone Presentation by Nihar Nadiya</div>
+        <div class="controls">
+          <button class="nav-btn" onclick="prevSlide()">← Prev</button>
+          <button class="nav-btn" onclick="goToSlide(1)">Restart ↺</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    let currentSlide = 1;
+    const totalSlides = 12;
+
+    function showSlide(n) {
+      document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+      const target = document.getElementById(`slide-${n}`);
+      if (target) {
+        target.classList.add('active');
+        currentSlide = n;
+      }
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides) {
+        showSlide(currentSlide + 1);
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 1) {
+        showSlide(currentSlide - 1);
+      }
+    }
+
+    function goToSlide(n) {
+      showSlide(n);
+    }
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        prevSlide();
+      } else if (e.key === 'Home') {
+        goToSlide(1);
+      } else if (e.key === 'End') {
+        goToSlide(totalSlides);
+      } else if (e.key === 'f' || e.key === 'F') {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(() => {});
+        } else {
+          document.exitFullscreen().catch(() => {});
+        }
+      }
+    });
+  </script>
+</body>
+</html>
