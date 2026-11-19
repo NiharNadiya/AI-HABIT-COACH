@@ -43,8 +43,8 @@ except Exception as e:
 # Contextual Bandit Engine (Weeks 11–12)
 bandit_engine = ContextualBanditEngine()
 
-N8N_WEBHOOK_URL = os.getenv("N8N_WEBHOOK_URL", "http://localhost:5678/webhook/wellness-alert")
-N8N_VERIFY_WEBHOOK_URL = os.getenv("N8N_VERIFY_WEBHOOK_URL", "http://localhost:5678/webhook/verify-phone")
+N8N_WEBHOOK_URL = os.getenv("N8N_WEBHOOK_URL", "https://n8n-latest-1-hrux.onrender.com/webhook/wellness-alert")
+N8N_VERIFY_WEBHOOK_URL = os.getenv("N8N_VERIFY_WEBHOOK_URL", "https://n8n-latest-1-hrux.onrender.com/webhook/verify-phone")
 LAST_ALERT_SENT = {}
 
 
