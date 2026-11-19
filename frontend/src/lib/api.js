@@ -1,4 +1,5 @@
-const BASE = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+const rawBase = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+const BASE = rawBase.replace(/\/+$/, "");
 
 async function post(path, body) {
   const res = await fetch(`${BASE}${path}`, {

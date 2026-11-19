@@ -26,8 +26,10 @@ export default function App() {
   const [verifyStatus, setVerifyStatus] = useState("");
   const [breakResetCount, setBreakResetCount] = useState(0);
 
-  // Routing View State: Always start on "verification" page as the first screen!
-  const [viewState, setViewState] = useState("verification");
+  // Routing View State: Remember if unlocked, otherwise prompt verification setup
+  const [viewState, setViewState] = useState(() => {
+    return localStorage.getItem("ai_coach_unlocked") === "true" ? "dashboard" : "verification";
+  });
 
   const handleAskAICoach = useCallback(async () => {
     setAiLoading(true);
@@ -182,10 +184,15 @@ export default function App() {
         initialPhone={phone}
         onVerified={() => {
           setIsVerified(true);
+          localStorage.setItem("ai_coach_unlocked", "true");
           setViewState("dashboard");
           refresh();
         }}
-        onSkip={() => setViewState("dashboard")}
+        onSkip={() => {
+          localStorage.setItem("ai_coach_unlocked", "true");
+          setViewState("dashboard");
+          refresh();
+        }}
       />
     );
   }
@@ -195,30 +202,55 @@ export default function App() {
 
   return (
     <div className="app">
-      <header className="header" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+      <header className="header" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "12px" }}>
         <div>
           <span className="eyebrow">AI HABIT COACH</span>
           <h1>Workplace Wellness Dashboard</h1>
           <p className="subtitle">
-            {backendOk ? `Welcome ${userName || 'User'} (${userGender}, age ${userAge}) — Personalized Ergonomics & Hydration` : "Backend not reachable — start the FastAPI server (see README)."}
+            {backendOk
+              ? `Welcome ${userName || 'User'} (${userGender}, age ${userAge}) — Personalized Ergonomics & Hydration`
+              : "Connecting to Cloud Backend (Render free tier wakes up in ~30s on first load)..."}
           </p>
         </div>
-        <button
-          onClick={() => setViewState("verification")}
-          className="btn-log"
-          style={{
-            marginTop: "10px",
-            fontSize: "12px",
-            background: "rgba(45, 212, 191, 0.08)",
-            borderColor: "var(--teal)",
-            color: "var(--teal)",
-            display: "flex",
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", marginTop: "10px", flexWrap: "wrap" }}>
+          <span style={{
+            fontSize: "11px",
+            padding: "5px 12px",
+            borderRadius: "14px",
+            background: backendOk ? "rgba(16, 185, 129, 0.12)" : "rgba(245, 158, 11, 0.12)",
+            border: `1px solid ${backendOk ? "rgba(16, 185, 129, 0.4)" : "rgba(245, 158, 11, 0.4)"}`,
+            color: backendOk ? "#34d399" : "#fbbf24",
+            fontWeight: "600",
+            display: "inline-flex",
             alignItems: "center",
-            gap: "6px"
-          }}
-        >
-          🔒 {isVerified ? `Verified: ${phone || 'SMS Active'}` : "Verify Profile & Phone"}
-        </button>
+            gap: "7px"
+          }}>
+            <span style={{
+              width: "7px",
+              height: "7px",
+              borderRadius: "50%",
+              backgroundColor: backendOk ? "#10b981" : "#f59e0b",
+              boxShadow: backendOk ? "0 0 8px #10b981" : "0 0 8px #f59e0b"
+            }}></span>
+            {backendOk ? "Cloud Backend Online" : "Waking up Backend (~30s)..."}
+          </span>
+
+          <button
+            onClick={() => setViewState("verification")}
+            className="btn-log"
+            style={{
+              fontSize: "12px",
+              background: "rgba(45, 212, 191, 0.08)",
+              borderColor: "var(--teal)",
+              color: "var(--teal)",
+              display: "flex",
+              alignItems: "center",
+              gap: "6px"
+            }}
+          >
+            🔒 {isVerified ? `Verified: ${phone || 'SMS Active'}` : "Profile & Verification"}
+          </button>
+        </div>
       </header>
 
       <div className="layout">

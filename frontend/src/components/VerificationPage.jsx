@@ -251,9 +251,12 @@ export default function VerificationPage({ initialName, initialGender, initialAg
             {/* Step 2: 6-Digit OTP Code Input */}
             {codeSent && (
               <form onSubmit={handleVerifyOTP} style={{ marginTop: "20px", paddingTop: "20px", borderTop: "1px solid #1f2e2a" }}>
-                <label style={{ display: "block", fontSize: "12px", fontWeight: "700", color: "#2dd4bf", marginBottom: "6px" }}>
-                  🔒 Enter 6-Digit Verification Code
-                </label>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+                  <label style={{ fontSize: "12px", fontWeight: "700", color: "#2dd4bf" }}>
+                    🔒 Enter 6-Digit Verification Code
+                  </label>
+                  <span style={{ fontSize: "11px", color: "#8ea19c" }}>Demo PIN: <strong style={{ color: "#34d399" }}>123456</strong></span>
+                </div>
                 <input
                   type="text"
                   maxLength={6}

@@ -169,7 +169,8 @@ ALLOWED_ORIGINS = ["*"] if CORS_ORIGINS_RAW == "*" else [o.strip() for o in CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
-    allow_credentials=True,
+    allow_origin_regex=r"https?://.*",
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
